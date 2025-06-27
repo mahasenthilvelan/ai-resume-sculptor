@@ -102,19 +102,19 @@ if uploaded_file:
                 return ent.text
         return "Name Not Found"
 
-    # Extract skills using SpaCy
-   def extract_skills(text):
-    nlp = spacy.load("en_core_web_sm")
-    doc = nlp(text.lower())
-    skills = []
-    common_skills = ['python', 'java', 'sql', 'machine learning', 'data analysis', 'communication', 'leadership']
-    for token in doc:
-        if token.text in common_skills:
-            skills.append(token.text)
-    return list(set(skills))
+    # ✅ Extract skills using SpaCy (corrected indentation)
+    def extract_skills(text):
+        nlp = spacy.load("en_core_web_sm")
+        doc = nlp(text.lower())
+        skills = []
+        common_skills = ['python', 'java', 'sql', 'machine learning', 'data analysis', 'communication', 'leadership']
+        for token in doc:
+            if token.text in common_skills:
+                skills.append(token.text)
+        return list(set(skills))
 
-# Run only if a file is uploaded
-    text = extract_text(uploaded_file.name)
+    # Run extraction
+    text = extract_text(filename)
     name = extract_name(text)
     email, phone = extract_contact(text)
     skills = extract_skills(text)
@@ -139,6 +139,7 @@ if uploaded_file:
 
 else:
     st.info("⬆️ Please upload a resume file to begin.")
+
 
 
 
