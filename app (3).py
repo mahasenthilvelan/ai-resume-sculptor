@@ -1685,7 +1685,6 @@ requirements = [
     "subprocess",
     "textstat",
     "time",
-    "fitz",
     "ngrok",
     "streamlit -q",
     "jsonify",
