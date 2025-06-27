@@ -13,4 +13,4 @@ pyngrok
 openai
 flask
 PyPDF2
-google-api-python-client
+pymupdf
