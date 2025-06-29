@@ -318,7 +318,7 @@ for i, q in enumerate(hr_questions):
         st.session_state.chat_history.append((q, sample_answer))
     else:
         st.success("Answer submitted.")
-        st.session_state.chat_history.append((q, user_input))
+    st.session_state.chat_history.append((q, user_input))
 
 # In[ ]:
 
@@ -622,7 +622,7 @@ if st.checkbox("Show Submitted Feedback"):
 # ✅ STEP 1: Install Requirements
 
 # ✅ STEP 2: Create a simple Flask backend API
-flask_code = '''
+
 from flask import Flask, jsonify, request
 
 app = Flask(__name__)
@@ -639,7 +639,7 @@ def feedback():
 
 if __name__ == '__main__':
     app.run(port=5000)
-'''
+
 
 with open("backend.py", "w") as f:
     f.write(flask_code)
@@ -649,13 +649,7 @@ import subprocess
 subprocess.Popen(["python3", "backend.py"])
 
 # ✅ STEP 4: Set up and start ngrok
-from pyngrok import ngrok
 
-
-
-ngrok.set_auth_token("2ygEupQpveEWCPPm6X14z4s1CAA_7GpWHAh3HAtvTftdkqoQF")  # <-- Replace with your real token
-public_url = ngrok.connect(8501)
-print("🔗 Flask is now public at:", public_url)
 
 # ✅ STEP 5: Create Streamlit app that talks to Flask
 streamlit_code = f'''
@@ -819,7 +813,6 @@ CREATE TABLE IF NOT EXISTS companies (
     interview_status TEXT
 )
 """)
-
 # APPLICANTS table: Resume and ATS score storage
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS applicants (
