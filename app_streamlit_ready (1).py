@@ -167,7 +167,6 @@ if uploaded_file:
 
 else:
     st.info("⬆️ Please upload a resume file to begin.")
-
 # In[ ]:
 from pyngrok import ngrok
 
