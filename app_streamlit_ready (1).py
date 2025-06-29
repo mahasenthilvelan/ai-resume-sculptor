@@ -168,36 +168,6 @@ if uploaded_file:
 else:
     st.info("⬆️ Please upload a resume file to begin.")
 # In[ ]:
-from pyngrok import ngrok
-
-# Set your ngrok token directly
-ngrok.set_auth_token("2ygEupQpveEWCPPm6X14z4s1CAA_7GpWHAh3HAtvTftdkqoQF")
-streamlit_app_code ="""
-import streamlit as st
-
-st.title("Resume ATS Matcher")
-
-uploaded_file = st.file_uploader("Upload your resume", type=["pdf", "docx"])
-
-if uploaded_file is not None:
-    st.success(f"File '{uploaded_file.name}' uploaded successfully.")
-    st.write("Resume processing and ATS scoring coming soon!")
-"""
-
-with open("app.py", "w") as f:
-    f.write(streamlit_app_code)
-import subprocess
-import time
-
-# Start streamlit
-process = subprocess.Popen(['streamlit', 'run', 'app.py'])
-
-# Wait a few seconds for Streamlit to start
-time.sleep(10)
-
-# Connect via ngrok
-public_url = ngrok.connect(8501)
-print("🔗 Your app is available at:", public_url)
 # In[ ]:
 import streamlit as st
 import pdfplumber
