@@ -114,7 +114,7 @@ if uploaded_file:
     return list(set(skills))
 
 # Run only if a file is uploaded
-if uploaded_file is not None:
+  if uploaded_file is not None:
     text = extract_text(uploaded_file.name)
     name = extract_name(text)
     email, phone = extract_contact(text)
@@ -138,7 +138,7 @@ if uploaded_file is not None:
     st.subheader("📦 JSON Output")
     st.json(resume_data)
 
-else:
+  else:
     st.info("⬆️ Please upload a resume file to begin.")
 
 
