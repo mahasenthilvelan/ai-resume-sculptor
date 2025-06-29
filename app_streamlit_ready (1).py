@@ -173,9 +173,13 @@ import streamlit as st
 import pdfplumber
 import docx
 import re
+import textstat
+import time
 
-st.title("Resume ATS Matcher")
+st.set_page_config(page_title="AI Resume Sculptor", layout="wide")
+st.title("📄 AI Resume Sculptor")
 
+# ------------------ Functions ------------------ #
 def extract_text_from_pdf(uploaded_file):
     text = ""
     with pdfplumber.open(uploaded_file) as pdf:
@@ -191,52 +195,55 @@ def extract_email(text):
     match = re.search(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b', text)
     return match.group(0) if match else "Not found"
 
-uploaded_file = st.file_uploader("Upload your resume", type=["pdf", "docx"])
-
-if uploaded_file is not None:
-    st.success(f"File '{uploaded_file.name}' uploaded successfully.")
-    # Extract text based on file type
-    if uploaded_file.name.endswith(".pdf"):
-        resume_text = extract_text_from_pdf(uploaded_file)
-    elif uploaded_file.name.endswith(".docx"):
-        resume_text = extract_text_from_docx(uploaded_file)
-    else:
-        resume_text = ""
-
-    # Display extracted info
-    st.subheader("Parsed Resume Data")
-    st.write("📧 Email:", extract_email(resume_text))
-    st.text_area("📝 Full Resume Text", resume_text[:3000])  # Limit for display
-
-
-# In[ ]:
-
-
 def get_keywords(text):
-    # Convert to lowercase and split into words
     words = re.findall(r'\b\w+\b', text.lower())
     return set(words)
 
-# Example job description
-job_description = """
-We are looking for a Python developer with experience in data analysis, Pandas, NumPy, and machine learning.
-Strong problem-solving skills and knowledge of Flask or Django is a plus.
-"""
+def analyze_soft_signals(text):
+    signals = {}
 
-if uploaded_file is not None:
+    leadership_words = ["led", "managed", "initiated", "coordinated", "supervised", "mentored"]
+    action_verbs = ["developed", "designed", "created", "implemented", "built", "executed"]
+
+    signals['Leadership Signals'] = sum(text.lower().count(w) for w in leadership_words)
+    signals['Action Verbs'] = sum(text.lower().count(w) for w in action_verbs)
+    signals['Readability Score'] = round(textstat.flesch_reading_ease(text), 2)
+    signals['Average Sentence Length'] = round(textstat.avg_sentence_length(text), 2)
+
+    return signals
+
+# ------------------ Upload & Parse Resume ------------------ #
+uploaded_file = st.file_uploader("📤 Upload your resume", type=["pdf", "docx"])
+
+if uploaded_file:
+    st.success(f"✅ File '{uploaded_file.name}' uploaded successfully.")
+
+    if uploaded_file.name.endswith(".pdf"):
+        resume_text = extract_text_from_pdf(uploaded_file)
+    else:
+        resume_text = extract_text_from_docx(uploaded_file)
+
+    email = extract_email(resume_text)
+
+    st.subheader("📑 Parsed Resume Content")
+    st.write("📧 Email:", email)
+    st.text_area("📝 Resume Preview", resume_text[:3000])
+
+    # ------------------ ATS Score Matching ------------------ #
+    job_description = """
+    We are looking for a Python developer with experience in data analysis, Pandas, NumPy, and machine learning.
+    Strong problem-solving skills and knowledge of Flask or Django is a plus.
+    """
     st.subheader("🔍 ATS Match Score")
 
     jd_keywords = get_keywords(job_description)
     resume_keywords = get_keywords(resume_text)
-
-    # Intersection of resume and JD keywords
     matched = jd_keywords & resume_keywords
     match_score = round(len(matched) / len(jd_keywords) * 100)
 
     st.write("✅ Matched Keywords:", ", ".join(matched))
     st.write("🎯 Match Score:", f"{match_score}%")
 
-    # Optionally: Show feedback
     if match_score >= 70:
         st.success("Great match! You're a strong fit for this job.")
     elif match_score >= 40:
@@ -244,43 +251,13 @@ if uploaded_file is not None:
     else:
         st.error("Low match. Resume needs improvement.")
 
-
-
-
-# In[ ]:
-
-
-import textstat
-
-def analyze_soft_signals(text):
-    signals = {}
-
-    # Leadership indicators
-    leadership_words = ["led", "managed", "initiated", "coordinated", "supervised", "mentored"]
-    leadership_count = sum(text.lower().count(word) for word in leadership_words)
-    signals['Leadership Signals'] = leadership_count
-
-    # Action verbs
-    action_verbs = ["developed", "designed", "created", "implemented", "built", "executed"]
-    action_count = sum(text.lower().count(word) for word in action_verbs)
-    signals['Action Verbs'] = action_count
-
-    # Readability score (Flesch Reading Ease)
-    signals['Readability Score'] = round(textstat.flesch_reading_ease(text), 2)
-
-    # Verbosity (average sentence length)
-    signals['Average Sentence Length'] = round(textstat.avg_sentence_length(text), 2)
-
-    return signals
-
-if uploaded_file is not None:
-    st.subheader("🧠 Soft Signal Analysis")
+    # ------------------ Soft Signals ------------------ #
+    st.subheader("🧠 Soft Signal Analyzer")
     soft_signals = analyze_soft_signals(resume_text)
 
     for k, v in soft_signals.items():
         st.write(f"{k}: {v}")
 
-    # Basic interpretation
     if soft_signals['Leadership Signals'] >= 3:
         st.success("Strong leadership tone.")
     else:
@@ -291,18 +268,13 @@ if uploaded_file is not None:
     else:
         st.warning("Consider using more impactful action verbs.")
 
-
-
-
-# In[ ]:
-
-
+# ------------------ Company HR Style Form ------------------ #
 st.subheader("🏢 Company HR Style Registration")
 
 with st.form("hr_form"):
     company_name = st.text_input("Company Name")
     location = st.text_input("Location")
-    core_domain = st.text_input("Company Core Area (e.g., AI, Finance, Software)")
+    core_domain = st.text_input("Company Core Area")
     qualifications = st.text_area("Required Qualifications")
     hiring_style = st.selectbox("Hiring Style", ["Google-style", "Startup-style", "Amazon-style", "Custom"])
     interview_type = st.selectbox("Interview Type", ["Technical", "Behavioral", "Both"])
@@ -312,8 +284,6 @@ with st.form("hr_form"):
 
     if submitted:
         st.success("Company profile registered successfully!")
-
-        # Example: Save to session (in real app, store in DB)
         st.session_state["registered_company"] = {
             "name": company_name,
             "location": location,
@@ -324,13 +294,8 @@ with st.form("hr_form"):
             "hr_logic": hr_logic
         }
 
-
-# In[ ]:
-
-
-import time
-
-st.subheader("🤖 HR Chat Simulation")
+# ------------------ HR Interview Simulation ------------------ #
+st.subheader("🤖 HR Mock Interview Chat")
 
 hr_questions = [
     "Tell me about yourself.",
@@ -344,20 +309,16 @@ if "chat_history" not in st.session_state:
 
 for i, q in enumerate(hr_questions):
     st.write(f"**Q{i+1}: {q}**")
-
     user_input = st.text_input(f"Your Answer {i+1}", key=f"answer_{i}")
 
-    # Show sample answer after delay
     if user_input == "":
-        time.sleep(15)  # Wait 15 seconds before showing model answer
-        sample_answer = f"Sample Answer: (e.g.) I am a self-motivated individual who enjoys working on innovative projects."
+        time.sleep(15)
+        sample_answer = f"(AI) Example Answer: I am a self-driven developer excited about solving real-world problems."
         st.info(sample_answer)
+        st.session_state.chat_history.append((q, sample_answer))
     else:
         st.success("Answer submitted.")
-
-    # Save to history
-    st.session_state.chat_history.append((q, user_input or sample_answer))
-
+        st.session_state.chat_history.append((q, user_input))
 
 # In[ ]:
 
