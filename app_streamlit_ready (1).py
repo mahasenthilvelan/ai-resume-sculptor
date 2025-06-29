@@ -114,32 +114,32 @@ if uploaded_file:
     return list(set(skills))
 
 # Run only if a file is uploaded
-  if uploaded_file is not None:
-    text = extract_text(uploaded_file.name)
-    name = extract_name(text)
-    email, phone = extract_contact(text)
-    skills = extract_skills(text)
+   if uploaded_file is not None:
+     text = extract_text(uploaded_file.name)
+     name = extract_name(text)
+     email, phone = extract_contact(text)
+     skills = extract_skills(text)
 
-    resume_data = {
+     resume_data = {
         "name": name,
         "email": email,
         "phone": phone,
         "skills": skills
-    }
+     }
 
     # Show results in Streamlit
-    st.subheader("📋 Extracted Resume Data")
-    st.write("**Name:**", name)
-    st.write("**Email:**", email)
-    st.write("**Phone:**", phone)
-    st.write("**Skills:**", ", ".join(skills))
-    st.text_area("📝 Full Resume Text", text[:3000])
+     st.subheader("📋 Extracted Resume Data")
+     st.write("**Name:**", name)
+     st.write("**Email:**", email)
+     st.write("**Phone:**", phone)
+     st.write("**Skills:**", ", ".join(skills))
+     st.text_area("📝 Full Resume Text", text[:3000])
 
-    st.subheader("📦 JSON Output")
-    st.json(resume_data)
+     st.subheader("📦 JSON Output")
+     st.json(resume_data)
 
-  else:
-    st.info("⬆️ Please upload a resume file to begin.")
+    else:
+     st.info("⬆️ Please upload a resume file to begin.")
 
 
 
