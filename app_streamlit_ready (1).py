@@ -64,12 +64,9 @@ import re
 import spacy
 import tempfile
 import json
+st.title("📂 Resume ATS Matcher")
 
-
-
-st.title("📄 Resume Upload & ATS Match")
-
-uploaded_file = st.file_uploader("Upload your resume (.pdf or .docx)", type=["pdf", "docx"])
+uploaded_file = st.file_uploader("Upload your resume", type=["pdf", "docx"])
 
 if uploaded_file:
     with tempfile.NamedTemporaryFile(delete=False) as tmp_file:
@@ -149,7 +146,7 @@ if uploaded_file:
         matched = resume_skills & required
         score = round((len(matched) / len(required)) * 100, 2) if required else 0
         missing = list(required - matched)
-        result= {
+        return {
             "match_score": score,
             "matched_skills": list(matched),
             "missing_skills": missing,
@@ -165,13 +162,12 @@ if uploaded_file:
     st.write("**Missing Skills:**", ", ".join(result["missing_skills"]))
     st.info(result["suggestion"])
 
+    # Optional console output
+    print(json.dumps(result, indent=2))
+
 else:
     st.info("⬆️ Please upload a resume file to begin.")
 
-
-# Show result
-import json
-print(json.dumps(result, indent=2))
 # In[ ]:
 from pyngrok import ngrok
 
