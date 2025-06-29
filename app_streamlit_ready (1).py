@@ -149,7 +149,7 @@ if uploaded_file:
         matched = resume_skills & required
         score = round((len(matched) / len(required)) * 100, 2) if required else 0
         missing = list(required - matched)
-        return {
+        result= {
             "match_score": score,
             "matched_skills": list(matched),
             "missing_skills": missing,
@@ -172,18 +172,7 @@ else:
 # Show result
 import json
 print(json.dumps(result, indent=2))
-
-
 # In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
 from pyngrok import ngrok
 
 # Set your ngrok token directly
@@ -214,14 +203,7 @@ time.sleep(10)
 # Connect via ngrok
 public_url = ngrok.connect(8501)
 print("🔗 Your app is available at:", public_url)
-
-
-
-
 # In[ ]:
-
-
-
 import streamlit as st
 import pdfplumber
 import docx
