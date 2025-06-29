@@ -195,7 +195,6 @@ uploaded_file = st.file_uploader("Upload your resume", type=["pdf", "docx"])
 
 if uploaded_file is not None:
     st.success(f"File '{uploaded_file.name}' uploaded successfully.")
-
     # Extract text based on file type
     if uploaded_file.name.endswith(".pdf"):
         resume_text = extract_text_from_pdf(uploaded_file)
