@@ -13,7 +13,7 @@ import time
 st.image("logo.png", width=250)  # ← #your_logo_path
 
 # Animated Text
-st.markdown("<h3 style='text-align: center;'>👋 Welcome to intellihire</h3>", unsafe_allow_html=True)
+st.markdown("<h3 style='text-align: center;'> Welcome to INTELLIHIRE</h3>", unsafe_allow_html=True)
 st.markdown("<h4 style='text-align: center;'>Your Smart ATS & HR Companion</h4>", unsafe_allow_html=True)
 
 # Add a short delay to simulate splash screen effect
@@ -30,7 +30,7 @@ st.markdown("---")
 import streamlit as st
 
 # Title
-st.title("🔐 Welcome to intellihire")
+st.title("🔐 Welcome to INTELLIHIRE")
 
 st.subheader("Login to Continue")
 
@@ -65,16 +65,18 @@ import spacy
 import tempfile
 import json
 
-st.title("📄 Resume Parsing")
 
-uploaded_file = st.file_uploader("Upload your resume", type=["pdf", "docx"])
+
+st.title("📄 Resume Upload & ATS Match")
+
+uploaded_file = st.file_uploader("Upload your resume (.pdf or .docx)", type=["pdf", "docx"])
 
 if uploaded_file:
     with tempfile.NamedTemporaryFile(delete=False) as tmp_file:
         tmp_file.write(uploaded_file.read())
         filename = tmp_file.name
 
-    # Function: Extract text
+    # Extract text
     def extract_text(filename):
         if filename.endswith(".pdf"):
             doc = fitz.open(filename)
@@ -84,8 +86,7 @@ if uploaded_file:
             return text
         elif filename.endswith(".docx"):
             return docx2txt.process(filename)
-        else:
-            return ""
+        return ""
 
     # Extract contact info
     def extract_contact(text):
@@ -93,7 +94,7 @@ if uploaded_file:
         phone = re.findall(r"\+?\d[\d\s\-]{8,}", text)
         return email[0] if email else "", phone[0] if phone else ""
 
-    # Extract name using SpaCy NER
+    # Extract name using SpaCy
     def extract_name(text):
         nlp = spacy.load("en_core_web_sm")
         doc = nlp(text)
@@ -102,15 +103,12 @@ if uploaded_file:
                 return ent.text
         return "Name Not Found"
 
-    # ✅ Extract skills using SpaCy (corrected indentation)
+    # Extract skills
     def extract_skills(text):
         nlp = spacy.load("en_core_web_sm")
         doc = nlp(text.lower())
-        skills = []
         common_skills = ['python', 'java', 'sql', 'machine learning', 'data analysis', 'communication', 'leadership']
-        for token in doc:
-            if token.text in common_skills:
-                skills.append(token.text)
+        skills = [token.text for token in doc if token.text in common_skills]
         return list(set(skills))
 
     # Run extraction
@@ -126,7 +124,7 @@ if uploaded_file:
         "skills": skills
     }
 
-    # Show results in Streamlit
+    # Display extracted data
     st.subheader("📋 Extracted Resume Data")
     st.write("**Name:**", name)
     st.write("**Email:**", email)
@@ -137,53 +135,39 @@ if uploaded_file:
     st.subheader("📦 JSON Output")
     st.json(resume_data)
 
+    # ATS Simulation
+    company_profile = {
+        "company": "Amazon",
+        "hiring_style": "Fast-paced, leadership-focused, deep tech",
+        "required_skills": ["python", "java", "leadership", "machine learning", "communication"],
+        "preferred_experience": "2+ years"
+    }
+
+    def ats_score(resume, company):
+        required = set(s.lower() for s in company["required_skills"])
+        resume_skills = set(s.lower() for s in resume["skills"])
+        matched = resume_skills & required
+        score = round((len(matched) / len(required)) * 100, 2) if required else 0
+        missing = list(required - matched)
+        return {
+            "match_score": score,
+            "matched_skills": list(matched),
+            "missing_skills": missing,
+            "suggestion": "Consider adding: " + ", ".join(missing)
+        }
+
+    result = ats_score(resume_data, company_profile)
+
+    # Display ATS result
+    st.subheader("📊 ATS Score & Suggestions")
+    st.write("**Match Score:**", f"{result['match_score']}%")
+    st.write("**Matched Skills:**", ", ".join(result["matched_skills"]))
+    st.write("**Missing Skills:**", ", ".join(result["missing_skills"]))
+    st.info(result["suggestion"])
+
 else:
     st.info("⬆️ Please upload a resume file to begin.")
 
-
-
-
-
-# In[ ]:
-
-
-# Resume data from Step 1 (or use manually here)
-# resume_data = {} # Removed this line
-
-# Sample company profile (Amazon-style)
-company_profile = {
-    "company": "Amazon",
-    "hiring_style": "Fast-paced, leadership-focused, deep tech",
-    "required_skills": ["python", "java", "leadership", "machine learning", "communication"],
-    "preferred_experience": "2+ years"
-}
-
-# ATS Scoring Logic
-def ats_score(resume, company):
-    required = set([s.lower() for s in company["required_skills"]])
-    resume_skills = set([s.lower() for s in resume["skills"]])
-
-    print("---Resume Skills Used for Scoring---")
-    print(resume["skills"])
-    print("---End of Resume Skills---")
-
-    matched = resume_skills.intersection(required)
-    # Handle division by zero if required skills is empty
-    score = (len(matched) / len(required) * 100) if len(required) > 0 else 0
-
-    missing = list(required - matched)
-
-    feedback = {
-        "match_score": round(score, 2),
-        "matched_skills": list(matched),
-        "missing_skills": missing,
-        "suggestion": "Try adding experience with: " + ", ".join(missing)
-    }
-
-    return feedback
-
-# Run the match
-result = ats_score(uploaded_file)
 
 # Show result
 import json
