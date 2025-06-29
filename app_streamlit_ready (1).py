@@ -65,7 +65,7 @@ import spacy
 import tempfile
 import json
 
-st.title("📄 Resume Parser")
+st.title("📄 Resume Parsing")
 
 uploaded_file = st.file_uploader("Upload your resume", type=["pdf", "docx"])
 
@@ -183,7 +183,7 @@ def ats_score(resume, company):
     return feedback
 
 # Run the match
-result = ats_score(resume_data, company_profile)
+result = ats_score(uploaded_file)
 
 # Show result
 import json
