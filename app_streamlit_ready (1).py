@@ -591,7 +591,8 @@ st.title("HR Interview Feedback Submission")
 applicant = st.selectbox("Select Candidate", shortlisted_applicants)
 
 # Feedback text
-feedback = st.text_area("Enter Interview Feedback", height=150)
+feedback = st.text_area("Enter Interview Feedback", height=150,key="feedback_text_1")
+feedback = st.text_area("Enter Interview Feedback", height=150, key="feedback_text_2")
 
 # Rating slider
 rating = st.slider("Rate Candidate (1 = Poor, 5 = Excellent)", 1, 5)
