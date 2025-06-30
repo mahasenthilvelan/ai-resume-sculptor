@@ -543,7 +543,8 @@ shortlisted_applicants = ["Alice Johnson", "Bob Singh", "Carla Mehta"]
 st.title("HR Interview Feedback Submission")
 
 # Select applicant
-applicant = st.selectbox("Select Candidate", shortlisted_applicants)
+applicant = st.selectbox("Select Candidate", shortlisted_applicants, key="select_candidate_1")
+applicant = st.selectbox("Select Candidate", shortlisted_applicants, key="select_candidate_2")
 
 # Input feedback
 feedback = st.text_area("Enter Interview Feedback", height=150)
