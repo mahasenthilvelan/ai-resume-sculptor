@@ -626,6 +626,7 @@ if st.checkbox("Show Submitted Feedback"):
 # ✅ STEP 2: Create a simple Flask backend API
 
 from flask import Flask, jsonify, request
+import socket
 
 app = Flask(__name__)
 
@@ -639,12 +640,25 @@ def feedback():
         "feedback": "Excellent communication and technical skills."
     })
 
+def get_free_port(default_port=5000):
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.bind(('', default_port))
+            return default_port
+    except OSError:
+        s = socket.socket()
+        s.bind(('', 0))
+        port = s.getsockname()[1]
+        s.close()
+        return port
+
 if __name__ == '__main__':
-    app.run(port=5050)
-
-
+    port = get_free_port(5050)
+    print(f"🚀 Flask server running on port {port}")
+    app.run(port=port)
 with open("backend.py", "w") as f:
     f.write(flask_code)
+
 
 # ✅ STEP 3: Run Flask in background
 import subprocess
