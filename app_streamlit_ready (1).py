@@ -595,7 +595,7 @@ feedback = st.text_area("Enter Interview Feedback", height=150,key="feedback_tex
 feedback = st.text_area("Enter Interview Feedback", height=150, key="feedback_text_2")
 
 # Rating slider
-rating = st.slider("Rate Candidate (1 = Poor, 5 = Excellent)", 1, 5)
+rating = st.slider("Rate Candidate (1 = Poor, 5 = Excellent)", 1, 5, key=f"rating_{applicant}")
 
 # Submit button
 if st.button("Submit Feedback"):
