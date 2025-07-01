@@ -571,7 +571,7 @@ conn = sqlite3.connect("applicant_feedback.db")
 c = conn.cursor()
 
 # Create table if not exists
-c.execute('''
+c.execute(
     CREATE TABLE IF NOT EXISTS feedback (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         applicant_name TEXT,
@@ -579,7 +579,7 @@ c.execute('''
         rating INTEGER,
         timestamp TEXT
     )
-''')
+)
 conn.commit()
 
 # Sample dynamic applicant list from database (mocking for now)
@@ -654,7 +654,7 @@ subprocess.Popen(["python3", "backend.py"])
 
 
 # ✅ STEP 5: Create Streamlit app that talks to Flask
-streamlit_code = f'''
+
 import streamlit as st
 import requests
 
@@ -670,7 +670,7 @@ if st.button("Get Feedback"):
         st.write(f"Feedback: {{data['feedback']}}")
     else:
         st.error("Could not fetch data")
-'''
+
 
 with open("app.py", "w") as f:
     f.write(streamlit_code)
