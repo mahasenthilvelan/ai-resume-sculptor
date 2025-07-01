@@ -598,7 +598,7 @@ feedback = st.text_area("Enter Interview Feedback", height=150, key="feedback_te
 rating = st.slider("Rate Candidate (1 = Poor, 5 = Excellent)", 1, 5, key=f"rating_{applicant}")
 
 # Submit button
-if st.button("Submit Feedback"):
+if st.button("Submit Feedback, key=f"submit_feedback_{applicant}"):
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     c.execute("INSERT INTO feedback (applicant_name, feedback, rating, timestamp) VALUES (?, ?, ?, ?)",
               (applicant, feedback, rating, timestamp))
