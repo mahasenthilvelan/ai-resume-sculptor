@@ -590,9 +590,8 @@ st.title("HR Interview Feedback Submission")
 # Select an applicant
 applicant = st.selectbox("Select Candidate", shortlisted_applicants)
 
-# Feedback text
-feedback = st.text_area("Enter Interview Feedback", height=150,key="feedback_text_1")
-feedback = st.text_area("Enter Interview Feedback", height=150, key="feedback_text_2")
+# Feedback input
+feedback = st.text_area("Enter Interview Feedback", height=150, key=f"feedback_text_{applicant}")
 
 # Rating slider
 rating = st.slider("Rate Candidate (1 = Poor, 5 = Excellent)", 1, 5, key=f"rating_{applicant}")
@@ -612,6 +611,7 @@ if st.checkbox("Show Submitted Feedback"):
     rows = c.fetchall()
     for row in rows:
         st.write(row)
+
 # feedback_status.py
 
 
