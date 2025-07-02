@@ -571,7 +571,7 @@ conn = sqlite3.connect("applicant_feedback.db")
 c = conn.cursor()
 
 # Create table if not exists
-c.execute('''
+c.execute("""
     CREATE TABLE IF NOT EXISTS feedback (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         applicant_name TEXT,
@@ -579,7 +579,7 @@ c.execute('''
         rating INTEGER,
         timestamp TEXT
     )
-''')
+""")
 conn.commit()
 
 # Sample dynamic applicant list from database (mocking for now)
