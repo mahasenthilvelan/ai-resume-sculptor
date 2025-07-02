@@ -561,17 +561,15 @@ if st.button("Submit Feedback"):
 
 # In[ ]:
 
-
 import streamlit as st
 import sqlite3
 from datetime import datetime
 
-# Connect to SQLite database (or create it)
-conn = sqlite3.connect("applicant_feedback.db")
-c = conn.cursor()
+# --- Database Setup ---
+conn = sqlite3.connect("applicant_feedback.db", check_same_thread=False)
+cursor = conn.cursor()
 
-# Create table if not exists
-c.execute("""
+cursor.execute("""
     CREATE TABLE IF NOT EXISTS feedback (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         applicant_name TEXT,
@@ -582,35 +580,48 @@ c.execute("""
 """)
 conn.commit()
 
-# Sample dynamic applicant list from database (mocking for now)
+# --- UI Header ---
+st.set_page_config(page_title="HR Interview Feedback")
+st.title("📋 HR Interview Feedback Submission")
+
+# --- Candidate List ---
 shortlisted_applicants = ["Alice Johnson", "Bob Singh", "Carla Mehta"]
-
-st.title("HR Interview Feedback Submission")
-
-# Select an applicant
 applicant = st.selectbox("Select Candidate", shortlisted_applicants)
 
-# Feedback input
-feedback = st.text_area("Enter Interview Feedback", height=150, key=f"feedback_text_{applicant}")
+# --- Feedback Input ---
+feedback = st.text_area("Enter Interview Feedback", height=150, key=f"feedback_{applicant}")
 
-# Rating slider
+# --- Rating ---
 rating = st.slider("Rate Candidate (1 = Poor, 5 = Excellent)", 1, 5, key=f"rating_{applicant}")
 
-# Submit button
-if st.button("Submit Feedback", key=f"submit_feedback_{applicant}"):
-    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    c.execute("INSERT INTO feedback (applicant_name, feedback, rating, timestamp) VALUES (?, ?, ?, ?)",
-              (applicant, feedback, rating, timestamp))
-    conn.commit()
-    st.success(f"✅ Feedback submitted for {applicant}")
-    st.info(f"📝 Rating: {rating}/5\n📄 Feedback: {feedback}")
+# --- Submit Button ---
+if st.button("Submit Feedback", key=f"submit_{applicant}"):
+    if feedback.strip():
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        cursor.execute("INSERT INTO feedback (applicant_name, feedback, rating, timestamp) VALUES (?, ?, ?, ?)",
+                       (applicant, feedback, rating, timestamp))
+        conn.commit()
+        st.success(f"✅ Feedback submitted for {applicant}")
+    else:
+        st.warning("⚠️ Please enter feedback before submitting.")
 
-# View feedback table (optional)
-if st.checkbox("Show Submitted Feedback"):
-    c.execute("SELECT * FROM feedback")
-    rows = c.fetchall()
-    for row in rows:
-        st.write(row)
+# --- Display Submitted Feedback ---
+if st.checkbox("📂 Show All Submitted Feedback"):
+    cursor.execute("SELECT applicant_name, feedback, rating, timestamp FROM feedback ORDER BY timestamp DESC")
+    rows = cursor.fetchall()
+
+    if rows:
+        for r in rows:
+            st.markdown(f"""
+            <div style="border:1px solid #ccc; border-radius:10px; padding:10px; margin-bottom:10px;">
+                <strong>👤 Candidate:</strong> {r[0]}  
+                <br><strong>⭐ Rating:</strong> {r[2]} / 5  
+                <br><strong>📝 Feedback:</strong> {r[1]}  
+                <br><small>🕒 Submitted at: {r[3]}</small>
+            </div>
+            """, unsafe_allow_html=True)
+    else:
+        st.info("No feedback submitted yet.")
 
 # feedback_status.py
 
