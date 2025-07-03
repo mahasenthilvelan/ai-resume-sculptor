@@ -63,39 +63,6 @@ if st.session_state['page'] == 'splash':
         st.stop()
     else:
         st.session_state['page'] = 'login'
-
-
-
-
-# Ensure session state keys exist before usage
-if 'page' not in st.session_state:
-    st.session_state['page'] = 'splash'
-if 'splash_done' not in st.session_state:
-    st.session_state['splash_done'] = False
-
-# ---------------------------
-# Login
-# ---------------------------
-if st.session_state['page'] == 'login':
-    st.header("🔐 Login")
-    option = st.radio("Login with", ["Email/Password", "Google"])
-    if option == "Email/Password":
-        u = st.text_input("Username")
-        e = st.text_input("Email")
-        p = st.text_input("Password", type="password")
-        if st.button("Login"):
-            if u and e and p:
-                st.session_state['page'] = 'profile'
-                st.stop()
-    else:
-        if st.button("Google Login"):
-            st.session_state['page'] = 'profile'
-            st.stop()
-
-
-# ---------------------------
-# Profile
-# ---------------------------
 if st.session_state['page'] == 'profile':
     st.header("👤 Profile")
     with st.form("profile_form"):
@@ -115,52 +82,9 @@ if st.session_state['page'] == 'profile':
             st.session_state['page'] = 'company'
             st.stop()
 
-# ---------------------------
-# Company
-# ---------------------------
-if st.session_state['page'] == 'company':
-    st.header("🏢 Company Registration")
-    with st.form("company_form"):
-        st.text_input("Company Name")
-        st.text_input("Location")
-        st.text_input("Branch")
-        st.text_area("Type")
-        if st.form_submit_button("Register"):
-            st.session_state['page'] = 'dashboard'
-            st.stop()
 
-# ---------------------------
-# Dashboard
-# ---------------------------
-if st.session_state['page'] == 'dashboard':
-    st.header("📂 Dashboard")
-    up = st.file_uploader("Upload Resume", type=["pdf", "docx"])
-    if up:
-        def extract(f):
-            return (
-                docx2txt.process(f)
-                if f.name.endswith("docx")
-                else "".join([p.extract_text() for p in pdfplumber.open(f).pages])
-            )
 
-        text = extract(up)
-        st.write(text[:300])
-
-        doc = nlp(text)
-        ent_name = next((e.text for e in doc.ents if e.label_ == "PERSON"), "None")
-        st.write(f"Name: {ent_name}")
-
-        tfidf = TfidfVectorizer()
-        res = tfidf.fit_transform([text, "python java sql"])
-        sim = cosine_similarity(res[0:1], res[1:2])[0][0]
-        st.write(f"TF-IDF: {round(sim * 100, 2)}% match")
-
-    st.button("Soft Signal Analyzer")
-    st.button("HR Q&A")
-    st.button("Mock Interview")
-    st.button("Scheduler")
-    st.button("Feedback")
-    st.button("Kannama Chatbot")
+# Ensure session state keys exist before usage
 
 # In[ ]:
 
