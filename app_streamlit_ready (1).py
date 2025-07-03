@@ -64,6 +64,12 @@ if st.session_state['page'] == 'splash':
     else:
         st.session_state['page'] = 'login'
 
+
+
+
+if 'page' not in st.session_state:
+    st.session_state['page'] = 'splash'
+    st.session_state['splash_done'] = False
 # ---------------------------
 # Login
 # ---------------------------
@@ -83,10 +89,6 @@ if st.session_state['page'] == 'login':
             st.session_state['page'] = 'profile'
             st.stop()
 
-
-if 'page' not in st.session_state:
-    st.session_state['page'] = 'splash'
-    st.session_state['splash_done'] = False
 
 # ---------------------------
 # Profile
