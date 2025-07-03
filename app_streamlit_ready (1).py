@@ -63,24 +63,7 @@ if st.session_state['page'] == 'splash':
         st.stop()
     else:
         st.session_state['page'] = 'login'
-if st.session_state['page'] == 'profile':
-    st.header("👤 Profile")
-    with st.form("profile_form"):
-        st.text_input("Name")
-        st.date_input("DOB")
-        st.radio("Gender", ["Male", "Female", "Other"])
-        st.text_input("Email")
-        st.text_area("Permanent Address")
-        st.text_area("Temporary Address")
-        st.text_input("City")
-        st.text_input("State")
-        st.text_input("Phone")
-        st.text_input("Qualification")
-        st.text_input("Mother Tongue")
-        st.text_input("Languages Known")
-        if st.form_submit_button("Save"):
-            st.session_state['page'] = 'company'
-            st.stop()
+
 
 
 
