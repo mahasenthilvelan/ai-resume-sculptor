@@ -67,9 +67,12 @@ if st.session_state['page'] == 'splash':
 
 
 
+# Ensure session state keys exist before usage
 if 'page' not in st.session_state:
     st.session_state['page'] = 'splash'
+if 'splash_done' not in st.session_state:
     st.session_state['splash_done'] = False
+
 # ---------------------------
 # Login
 # ---------------------------
