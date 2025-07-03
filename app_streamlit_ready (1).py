@@ -34,40 +34,146 @@ st.title("🔐 Welcome to INTELLIHIRE")
 
 st.subheader("Login to Continue")
 
-# Tabs for Login Options (Phone removed)
-login_method = st.radio("Choose login method:", ["Email", "Continue with Google"])
+import streamlit as st
+import time
+import pdfplumber
+import docx2txt
+import spacy
+import re
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 
-if login_method == "Email":
-    username = st.text_input("Username")
-    email = st.text_input("Email")
-    password = st.text_input("Password", type="password")
+# ---------------------------
+# Safe SpaCy load
+# ---------------------------
+try:
+    import en_core_web_sm
+    nlp = en_core_web_sm.load()
+except:
+    st.error("❌ SpaCy model not found. Run: python -m spacy download en_core_web_sm")
+    st.stop()
 
-    if st.button("Login with Email"):
-        if username and email and password:
-            # In real use, verify from DB
-            st.success(f"✅ Welcome {username}, you're logged in with email.")
-        else:
-            st.error("❌ Please fill all fields.")
+# ---------------------------
+# Initialize session state
+# ---------------------------
+for k, v in {'page': 'splash', 'splash_done': False}.items():
+    if k not in st.session_state:
+        st.session_state[k] = v
 
-elif login_method == "Continue with Google":
-    st.info("🔗 Redirecting to Google OAuth (Feature to be implemented)")
-    if st.button("Login with Google"):
-        st.success("✅ Google login simulated (actual implementation uses Firebase or OAuth2).")
+# ---------------------------
+# Splash Page
+# ---------------------------
 if st.session_state['page'] == 'splash':
     if not st.session_state['splash_done']:
         st.image('logo.png', width=200)
         st.title("Welcome to IntelliHire")
-        time.sleep(1)
+        time.sleep(1.5)
         st.session_state['splash_done'] = True
         st.session_state['page'] = 'login'
         st.stop()
     else:
         st.session_state['page'] = 'login'
 
+# ---------------------------
+# Login Page
+# ---------------------------
+if st.session_state['page'] == 'login':
+    st.header("🔐 Login")
+    option = st.radio("Login with", ["Email/Password", "Google"])
 
+    if option == "Email/Password":
+        u = st.text_input("Username")
+        e = st.text_input("Email")
+        p = st.text_input("Password", type="password")
+        if st.button("Login"):
+            if u and e and p:
+                st.success(f"✅ Welcome {u}, you're logged in.")
+                st.session_state['page'] = 'profile'
+                st.stop()
+            else:
+                st.error("❌ Please fill all fields.")
+    else:
+        st.info("🔗 Redirecting to Google OAuth (Feature to be implemented)")
+        if st.button("Login with Google"):
+            st.success("✅ Google login simulated.")
+            st.session_state['page'] = 'profile'
+            st.stop()
 
+# ---------------------------
+# Profile Page
+# ---------------------------
+if st.session_state['page'] == 'profile':
+    st.header("👤 Profile Information")
+    with st.form("profile_form"):
+        st.text_input("Name")
+        st.date_input("DOB")
+        st.radio("Gender", ["Male", "Female", "Other"])
+        st.text_input("Email")
+        st.text_area("Permanent Address")
+        st.text_area("Temporary Address")
+        st.text_input("City")
+        st.text_input("State")
+        st.text_input("Phone")
+        st.text_input("Qualification")
+        st.text_input("Mother Tongue")
+        st.text_input("Languages Known")
+        if st.form_submit_button("Save"):
+            st.success("✅ Profile saved!")
+            st.session_state['page'] = 'company'
+            st.stop()
 
-# Ensure session state keys exist before usage
+# ---------------------------
+# Company Registration Page
+# ---------------------------
+if st.session_state['page'] == 'company':
+    st.header("🏢 Company Registration")
+    with st.form("company_form"):
+        st.text_input("Company Name")
+        st.text_input("Location")
+        st.text_input("Branch")
+        st.text_area("Type (e.g., IT, Manufacturing, etc.)")
+        if st.form_submit_button("Register"):
+            st.success("✅ Company registered!")
+            st.session_state['page'] = 'dashboard'
+            st.stop()
+
+# ---------------------------
+# Dashboard Page
+# ---------------------------
+if st.session_state['page'] == 'dashboard':
+    st.header("📂 Dashboard")
+    up = st.file_uploader("Upload Resume", type=["pdf", "docx"])
+    if up:
+        def extract(f):
+            if f.name.endswith("docx"):
+                return docx2txt.process(f)
+            else:
+                with pdfplumber.open(f) as pdf:
+                    return "".join([p.extract_text() or "" for p in pdf.pages])
+
+        text = extract(up)
+        st.subheader("📄 Resume Preview")
+        st.write(text[:300])
+
+        # Named Entity Recognition
+        doc = nlp(text)
+        ent_name = next((e.text for e in doc.ents if e.label_ == "PERSON"), "Not found")
+        st.write(f"👤 Extracted Name: {ent_name}")
+
+        # TF-IDF Matching Example
+        tfidf = TfidfVectorizer()
+        res = tfidf.fit_transform([text, "python java sql"])
+        sim = cosine_similarity(res[0:1], res[1:2])[0][0]
+        st.write(f"📊 TF-IDF Similarity: {round(sim * 100, 2)}% match")
+
+    st.markdown("### 🚀 Features")
+    st.button("Soft Signal Analyzer")
+    st.button("HR Q&A")
+    st.button("Mock Interview")
+    st.button("Scheduler")
+    st.button("Feedback")
+    st.button("Kannama Chatbot")
+
 
 # In[ ]:
 
