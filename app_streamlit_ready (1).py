@@ -38,20 +38,9 @@ import streamlit as st
 import time
 import pdfplumber
 import docx2txt
-import spacy
 import re
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-
-# ---------------------------
-# Safe SpaCy load
-# ---------------------------
-try:
-    import en_core_web_sm
-    nlp = en_core_web_sm.load()
-except:
-    st.error("❌ SpaCy model not found. Run: python -m spacy download en_core_web_sm")
-    st.stop()
 
 # ---------------------------
 # Initialize session state
@@ -59,6 +48,17 @@ except:
 for k, v in {'page': 'splash', 'splash_done': False}.items():
     if k not in st.session_state:
         st.session_state[k] = v
+
+# ---------------------------
+# Simple Name Extractor (Regex)
+# ---------------------------
+def extract_name(text):
+    lines = text.split('\n')
+    for line in lines:
+        line = line.strip()
+        if line and re.match(r"^[A-Z][a-z]+(?: [A-Z][a-z]+)*$", line):
+            return line
+    return "Not found"
 
 # ---------------------------
 # Splash Page
@@ -155,12 +155,11 @@ if st.session_state['page'] == 'dashboard':
         st.subheader("📄 Resume Preview")
         st.write(text[:300])
 
-        # Named Entity Recognition
-        doc = nlp(text)
-        ent_name = next((e.text for e in doc.ents if e.label_ == "PERSON"), "Not found")
-        st.write(f"👤 Extracted Name: {ent_name}")
+        # Extract name using regex fallback
+        name_extracted = extract_name(text)
+        st.write(f"👤 Extracted Name: {name_extracted}")
 
-        # TF-IDF Matching Example
+        # TF-IDF Skill Match Example
         tfidf = TfidfVectorizer()
         res = tfidf.fit_transform([text, "python java sql"])
         sim = cosine_similarity(res[0:1], res[1:2])[0][0]
@@ -173,6 +172,7 @@ if st.session_state['page'] == 'dashboard':
     st.button("Scheduler")
     st.button("Feedback")
     st.button("Kannama Chatbot")
+
 
 
 # In[ ]:
