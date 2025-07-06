@@ -2,8 +2,6 @@
 # coding: utf-8
 
 # In[ ]:
-
-
 #step 0 Logo + Splash Screen
 
 import streamlit as st
