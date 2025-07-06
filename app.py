@@ -2,6 +2,139 @@
 # coding: utf-8
 
 # app.py
+# app.py
+
+import streamlit as st
+import sqlite3
+import time
+import matplotlib.pyplot as plt
+
+# ------------------ SESSION INIT ------------------ #
+if 'page' not in st.session_state:
+    st.session_state.page = 'login'
+
+# ------------------ OWNER CREDENTIAL CHECK ------------------ #
+def is_owner(email, password):
+    return email == "owner@intellihire.com" and password == "owner_secret_2025"
+
+# ------------------ DB CONNECTION ------------------ #
+def get_connection():
+    return sqlite3.connect("resume_ats.db")
+
+# ------------------ LOGIN UI ------------------ #
+def login_page():
+    st.image("logo.png", width=250)
+    st.title("🔐 INTELLIHIRE LOGIN")
+
+    role = st.selectbox("Login As", ["User", "Company"])
+    email = st.text_input("Email")
+    password = st.text_input("Password", type="password")
+
+    if st.button("Login"):
+        if is_owner(email, password):
+            st.session_state.page = "owner"
+            st.success("✅ Logged in as OWNER")
+        elif role == "User":
+            conn = get_connection()
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM users WHERE email=? AND password=?", (email, password))
+            result = cursor.fetchone()
+            conn.close()
+            if result:
+                st.session_state.page = "user"
+                st.success("✅ Logged in as USER")
+            else:
+                st.error("❌ Invalid user credentials")
+        elif role == "Company":
+            conn = get_connection()
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM companies WHERE name=? AND interview_status=?", (email, password))
+            result = cursor.fetchone()
+            conn.close()
+            if result:
+                st.session_state.page = "company"
+                st.success("✅ Logged in as COMPANY")
+            else:
+                st.error("❌ Invalid company credentials")
+
+# ------------------ OWNER DASHBOARD ------------------ #
+def owner_dashboard():
+    st.title("🧑‍💼 Owner Dashboard")
+
+    conn = get_connection()
+    cur = conn.cursor()
+
+    cur.execute("SELECT COUNT(*) FROM users")
+    user_count = cur.fetchone()[0]
+
+    cur.execute("SELECT COUNT(*) FROM companies")
+    company_count = cur.fetchone()[0]
+
+    cur.execute("SELECT COUNT(*) FROM applicants")
+    resume_count = cur.fetchone()[0]
+
+    cur.execute("SELECT COUNT(*) FROM feedback WHERE status = 'selected'")
+    placed = cur.fetchone()[0]
+
+    cur.execute("SELECT COUNT(*) FROM feedback WHERE status = 'rejected'")
+    rejected = cur.fetchone()[0]
+
+    col1, col2, col3 = st.columns(3)
+    col1.metric("👥 Users", user_count)
+    col2.metric("🏢 Companies", company_count)
+    col3.metric("📂 Resumes", resume_count)
+
+    col4, col5 = st.columns(2)
+    col4.metric("✅ Placed", placed)
+    col5.metric("❌ Rejected", rejected)
+
+    st.markdown("---")
+    st.subheader("🗑️ Remove User/Company")
+    to_delete = st.text_input("Enter email/username/company name")
+
+    if st.button("Delete User"):
+        cur.execute("DELETE FROM users WHERE email = ? OR username = ?", (to_delete, to_delete))
+        conn.commit()
+        st.success("✅ User deleted.")
+
+    if st.button("Delete Company"):
+        cur.execute("DELETE FROM companies WHERE name = ?", (to_delete,))
+        conn.commit()
+        st.success("✅ Company deleted.")
+
+    st.markdown("---")
+    st.subheader("📊 Usage Analysis")
+
+    fig, ax = plt.subplots()
+    ax.bar(["Correct Usage", "Wrong Usage"], [placed, rejected], color=["green", "red"])
+    ax.set_ylabel("Users")
+    ax.set_title("ATS Resume Outcome")
+    st.pyplot(fig)
+
+    conn.close()
+
+# ------------------ USER DASHBOARD ------------------ #
+def user_dashboard():
+    st.title("👤 User Dashboard")
+    st.info("🛠️ Work in Progress: Resume upload, ATS match, feedback history...")
+
+# ------------------ COMPANY DASHBOARD ------------------ #
+def company_dashboard():
+    st.title("🏢 Company Dashboard")
+    st.info("🛠️ Work in Progress: View applicants, schedule interviews, see match scores...")
+
+# ------------------ MAIN ROUTER ------------------ #
+if st.session_state.page == 'login':
+    login_page()
+elif st.session_state.page == 'owner':
+    owner_dashboard()
+elif st.session_state.page == 'user':
+    user_dashboard()
+elif st.session_state.page == 'company':
+    company_dashboard()
+
+
+
 
 import streamlit as st
 import time
