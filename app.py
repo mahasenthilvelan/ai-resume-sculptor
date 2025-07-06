@@ -22,7 +22,7 @@ if st.session_state['page'] == 'splash':
     time.sleep(2)  # splash delay
     st.session_state['splash_done'] = True
     st.session_state['page'] = 'login'
-    st.experimental_rerun()  # rerun to load login
+    st.rerun()  # rerun to load login
 
 # -------------- STEP 2: Login Page --------------
 if st.session_state['page'] == 'login':
