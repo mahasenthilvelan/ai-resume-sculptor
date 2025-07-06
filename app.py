@@ -47,7 +47,8 @@ if st.session_state['page'] == 'login':
         st.info("🔗 Redirecting to Google OAuth (Feature to be implemented)")
         if st.button("Login with Google"):
             st.success("✅ Google login simulated (actual implementation uses Firebase or OAuth2).")
-
+            st.session_state['page'] = 'resume_matcher'
+            st.stop()
 
 
 
