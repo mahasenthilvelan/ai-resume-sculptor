@@ -1,3 +1,8 @@
+streamlit>=1.15
+matplotlib
+pandas
+sqlite3-binary
+
 streamlit
 pandas
 requests
