@@ -23,7 +23,7 @@ if st.session_state['page'] == 'splash':
     time.sleep(2)  # splash delay
     st.session_state['splash_done'] = True
     st.session_state['page'] = 'login'
-    st.rerun  # rerun to load login
+    st.rerun() # rerun to load login
 
 # -------------- STEP 2: Login Page --------------
 if st.session_state['page'] == 'login':
@@ -41,6 +41,8 @@ if st.session_state['page'] == 'login':
             if username and email and password:
                 st.success(f"✅ Welcome {username}, you're logged in with email.")
                 # Optional: st.session_state.logged_in = True
+                st.session_state['page'] = 'resume_matcher'
+                st.rerun()  # Move to resume matcher after login
             else:
                 st.error("❌ Please fill all fields.")
 
