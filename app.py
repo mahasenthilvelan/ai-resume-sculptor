@@ -1,66 +1,53 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
-#step 0 Logo + Splash Screen
+# app.py
 
 import streamlit as st
 import time
 
-# Display Logo (upload 'logo.png' to the same folder or use a URL)
-st.image("logo.png", width=250)  # ← #your_logo_path
+# -------------- STEP 0: Initialize Session State Keys --------------
+if 'page' not in st.session_state:
+    st.session_state['page'] = 'splash'
 
-# Animated Text
-st.markdown("<h3 style='text-align: center;'> Welcome to INTELLIHIRE</h3>", unsafe_allow_html=True)
-st.markdown("<h4 style='text-align: center;'>Your Smart ATS & HR Companion</h4>", unsafe_allow_html=True)
+if 'splash_done' not in st.session_state:
+    st.session_state['splash_done'] = False
 
-# Add a short delay to simulate splash screen effect
-time.sleep(2)  # shows splash for 2 seconds
-
-# Optional horizontal line before home screen starts
-st.markdown("---")
-
-
-# In[ ]:
-
-
-#step 1 login
-import streamlit as st
-
-# Title
-st.title("🔐 Welcome to INTELLIHIRE")
-
-st.subheader("Login to Continue")
-
-# Tabs for Login Options (Phone removed)
-login_method = st.radio("Choose login method:", ["Email", "Continue with Google"])
-
-if login_method == "Email":
-    username = st.text_input("Username")
-    email = st.text_input("Email")
-    password = st.text_input("Password", type="password")
-
-    if st.button("Login with Email"):
-        if username and email and password:
-            # In real use, verify from DB
-            st.success(f"✅ Welcome {username}, you're logged in with email.")
-        else:
-            st.error("❌ Please fill all fields.")
-
-elif login_method == "Continue with Google":
-    st.info("🔗 Redirecting to Google OAuth (Feature to be implemented)")
-    if st.button("Login with Google"):
-        st.success("✅ Google login simulated (actual implementation uses Firebase or OAuth2).")
+# -------------- STEP 1: Splash Screen --------------
 if st.session_state['page'] == 'splash':
-    if not st.session_state['splash_done']:
-        st.image('logo.png', width=200)
-        st.title("Welcome to IntelliHire")
-        time.sleep(1)
-        st.session_state['splash_done'] = True
-        st.session_state['page'] = 'login'
-        st.stop()
-    else:
-        st.session_state['page'] = 'login'
+    st.image("logo.png", width=250)  # Your logo file should be in the same folder
+    st.markdown("<h3 style='text-align: center;'> Welcome to INTELLIHIRE</h3>", unsafe_allow_html=True)
+    st.markdown("<h4 style='text-align: center;'>Your Smart ATS & HR Companion</h4>", unsafe_allow_html=True)
+
+    time.sleep(2)  # splash delay
+    st.session_state['splash_done'] = True
+    st.session_state['page'] = 'login'
+    st.experimental_rerun()  # rerun to load login
+
+# -------------- STEP 2: Login Page --------------
+if st.session_state['page'] == 'login':
+    st.title("🔐 Welcome to INTELLIHIRE")
+    st.subheader("Login to Continue")
+
+    login_method = st.radio("Choose login method:", ["Email", "Continue with Google"])
+
+    if login_method == "Email":
+        username = st.text_input("Username")
+        email = st.text_input("Email")
+        password = st.text_input("Password", type="password")
+
+        if st.button("Login with Email"):
+            if username and email and password:
+                st.success(f"✅ Welcome {username}, you're logged in with email.")
+                # Optional: st.session_state.logged_in = True
+            else:
+                st.error("❌ Please fill all fields.")
+
+    elif login_method == "Continue with Google":
+        st.info("🔗 Redirecting to Google OAuth (Feature to be implemented)")
+        if st.button("Login with Google"):
+            st.success("✅ Google login simulated (actual implementation uses Firebase or OAuth2).")
+
 
 
 
