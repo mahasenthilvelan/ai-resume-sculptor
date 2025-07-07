@@ -52,7 +52,155 @@ if st.session_state['page'] == 'login':
             st.success("✅ Google login simulated (actual implementation uses Firebase or OAuth2).")
             st.session_state['page'] = 'resume_matcher'
             st.rerun()
+#step 17
+import streamlit as st
+import pyrebase
 
+firebase_config = {
+    "apiKey": "AIzaSyBWDSUUJO9rnmaeHw0m6UHvzX_F3MOx70Y",
+    "authDomain": "your-project.firebaseapp.com",
+    "projectId": "your-project",
+    "storageBucket": "your-project.appspot.com",
+    "messagingSenderId": "SENDER_ID",
+    "appId": "APP_ID",
+    "databaseURL": ""
+}
+
+firebase = pyrebase.initialize_app(firebase_config)
+auth = firebase.auth()
+
+st.title("🔐 Login with Google (Firebase Auth)")
+
+email = st.text_input("Email")
+password = st.text_input("Password", type="password")
+
+if st.button("Login"):
+    try:
+        user = auth.sign_in_with_email_and_password(email, password)
+        st.success(f"Welcome, {email}")
+    except:
+        st.error("Login failed. Check credentials.")
+
+# In[ ]:
+
+# Streamlit UI
+st.title("🔐 AI Resume Sculptor Login")
+login_option = st.radio("Choose Login Method", ["Email/Password", "Google (Simulated)"])
+
+if login_option == "Email/Password":
+    email = st.text_input("Email")
+    password = st.text_input("Password", type="password")
+    if st.button("Login"):
+        try:
+            user = auth.sign_in_with_email_and_password(email, password)#integrated(real)
+            st.success(f"✅ Logged in as {email}")
+        except:
+            st.error("❌ Invalid email or password.")
+#smiulated(login)
+elif login_option == "Google (Simulated)":
+    st.info("🔗 In real apps, Google Sign-In uses Firebase OAuth or popup in web apps.")
+    if st.button("Continue with Google"):
+        st.success("✅ Simulated Google login complete (for prototype/demo only).")
+
+# Optional: Add logout or session state handling
+
+
+# In[ ]:
+
+
+#step 17 #step 17  connect your Firebase project to Streamlit using Python
+#Step 3: Streamlit Login UI with Firebase Authentication
+st.title("🔐 Login with Firebase (Email Only)")
+
+email = st.text_input("Email")
+password = st.text_input("Password", type="password")
+
+if st.button("Login"):
+    try:
+        user = auth.sign_in_with_email_and_password(email, password)
+        st.success("✅ Login Successful!")
+        st.write("Welcome, UID:", user['localId'])
+    except:
+        st.error("❌ Invalid email or password.")
+
+
+# In[ ]:
+
+
+#step 17 connect your Firebase project to Streamlit using Python
+#step 4  Optional: Sign Up (Firebase)
+if st.button("Sign Up"):
+    try:
+        user = auth.create_user_with_email_and_password(email, password)
+        st.success("✅ User Created!")
+    except:
+        st.error("⚠️ Account already exists or invalid details.")
+
+
+# In[ ]:
+
+
+#Step 18: OTP via SendGrid or Twilio (Optional for Production Use)
+#step 1
+
+
+# In[ ]:
+
+
+# In[ ]:
+
+
+# Step 18: OTP via MailSlurp
+import streamlit as st
+import random
+import time
+from mailslurp_client import Configuration, ApiClient, InboxControllerApi, SendEmailOptions
+
+# 🟨 Your API key here from MailSlurp
+MAILSLURP_API_KEY = "250a10842e4aa9f1fc351ad7717d240dcae868bcb14086d14bfd88dfb3d657a5"  # ← #your_api_key
+
+# 🟨 OTP storage for verification
+if "generated_otp" not in st.session_state:
+    st.session_state.generated_otp = ""
+
+# 🟨 Configure MailSlurp client
+configuration = Configuration()
+configuration.api_key["x-api-key"] ="250a10842e4aa9f1fc351ad7717d240dcae868bcb14086d14bfd88dfb3d657a5"# ← #your_api_key
+api_client = ApiClient(configuration)
+inbox_api = InboxControllerApi(api_client)
+
+# 🟩 Create a new inbox
+st.title("📧 OTP Login via MailSlurp")
+
+if "email_address" not in st.session_state:
+    inbox = inbox_api.create_inbox()
+    st.session_state.inbox_id = inbox.id
+    st.session_state.email_address = inbox.email_address
+
+st.info(f"Temporary Login Email: **{st.session_state.email_address}**")  # ← #your_email
+
+# 🟨 Send OTP
+if st.button("Send OTP"):
+    otp = str(random.randint(100000, 999999))
+    st.session_state.generated_otp = otp
+
+    send_options = SendEmailOptions(
+        to=[st.session_state.email_address],
+        subject="Your OTP Code",
+        body=f"Your one-time password is: {otp}"
+    )
+
+    inbox_api.send_email(inbox_id=st.session_state.inbox_id, send_email_options=send_options)
+    st.success("✅ OTP sent to your MailSlurp email inbox.")
+
+# 🟩 Display field to input OTP
+entered_otp = st.text_input("Enter OTP")
+
+if st.button("Verify OTP"):
+    if entered_otp == st.session_state.generated_otp:
+        st.success("🎉 OTP Verified! You’re logged in.")
+    else:
+        st.error("❌ Incorrect OTP. Please try again.")
 
 
 
@@ -1165,17 +1313,7 @@ if st.button("Compare Skills (TF-IDF Match)"):
             st.error("❌ Weak match. Skills don't align well with job requirements.")
     except:
         st.error("Something went wrong. Please check your input.")
-
-
 # In[ ]:
-
-
-#step 17
-
-
-# In[ ]:
-
-
 #step 17
 import streamlit as st
 import pyrebase
@@ -1205,53 +1343,7 @@ if st.button("Login"):
     except:
         st.error("Login failed. Check credentials.")
 
-
 # In[ ]:
-
-
-#step 17 #step 17  connect your Firebase project to Streamlit using Python
-#step 2  Use Your Firebase Config in Python
-import streamlit as st
-import pyrebase
-
-# ✅ Replace these values with your Firebase config
-firebaseConfig = {
-    "apiKey": "AIzaSyBWDSUUJO9rnmaeHw0m6UHvzX_F3MOx70Y",
-    "authDomain": "your-project-id.firebaseapp.com",
-    "projectId": "your-project-id",
-    "storageBucket": "your-project-id.appspot.com",
-    "messagingSenderId": "1234567890",
-    "appId": "1:1234567890:web:abcdef123456",
-    "databaseURL": ""  # Optional
-}
-
-firebase = pyrebase.initialize_app(firebaseConfig)
-auth = firebase.auth()
-
-
-# In[ ]:
-
-
-# Firebase Google Sign-In Simulation with Email/Password fallback (Streamlit)
-# both Integrated (REAL) & Simulated (FAKE)
-import streamlit as st
-import pyrebase
-
-# Firebase configuration
-firebase_config = {
-    "apiKey": "AIzaSyBWDSUUJO9rnmaeHw0m6UHvzX_F3MOx70Y",
-    "authDomain": "YOUR_PROJECT_ID.firebaseapp.com",
-    "projectId": "YOUR_PROJECT_ID",
-    "storageBucket": "YOUR_PROJECT_ID.appspot.com",
-    "messagingSenderId": "SENDER_ID",
-    "appId": "APP_ID",
-    "measurementId": "G-MEASUREMENT_ID",
-    "databaseURL": ""
-}
-
-# Initialize Firebase
-firebase = pyrebase.initialize_app(firebase_config)
-auth = firebase.auth()
 
 # Streamlit UI
 st.title("🔐 AI Resume Sculptor Login")
